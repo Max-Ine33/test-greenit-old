@@ -17,6 +17,6 @@ flow:
     container: Small_load_Container
     commands:
       - type: console
-        command: python3 /tmp/repo/flask-api/app.py
+        command: python3 /tmp/repo/app.py
         detach: true
         note: Running app
