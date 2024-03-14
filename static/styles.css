@@ -1,0 +1,45 @@
+body {
+    font-family: monospace;
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    overflow: hidden; /* Prevent scrollbars */
+    background-image: url('old-monitor.png');
+    background-size: cover;
+    background-attachment: fixed; /* Fix background in place */
+    background-position: center;
+    position: relative; /* Ensure body is positioned relatively */
+}
+
+#terminal {
+    width: 525px; /* Fixed width */
+    height: 390px; /* Fixed height */
+    border: 1px solid #ccc;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #00d10a;
+    overflow-y: auto;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 50px;
+    position: absolute; /* Position terminal absolutely */
+    top: 400%; /* Align terminal to the vertical center */
+    left: 50%; /* Align terminal to the horizontal center */
+    transform: translate(-50%, -50%); /* Center terminal */
+}
+
+input[type="text"] {
+    width: calc(100% - 22px); /* Adjusted width */
+    padding: -100px; /* Adjusted padding */
+    font-family: monospace;
+    font-size: 18px;
+    display: block;
+    border: none;
+    background-color: transparent;
+    color: #00d10a;
+    outline: none;
+    position: relative; /* Position input field absolutely */
+    top: 420px;
+    bottom: 20px; /* Adjust distance from the bottom */
+    left: 81%; /* Align input to the horizontal center */
+    transform: translateX(-50%); /* Center input horizontally */
+}

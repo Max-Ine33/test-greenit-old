@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Terminal</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+<body>
+    <h1>Web Terminal</h1>
+    <div id="terminal">
+        <div id="prompt"></div>
+    </div>
+    <div>
+        <input type="text" id="commandInput" placeholder="Enter command" onpaste="limitPasteLength(event)" rows="1" oninput="limitCharactersPerLine(event)">
+    </div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io.connect();
+        let currentPath = '/';
+
+        socket.on('connect', () => {
+            appendToTerminal('Connected to server', 'system');
+            updatePrompt();
+        });
+
+        socket.on('disconnect', () => {
+            appendToTerminal('Disconnected from server', 'system');
+        });
+
+        socket.on('terminal_output', (data) => {
+            appendToTerminal(data);
+        });
+
+        function sendCommand() {
+            const commandInput = document.getElementById('commandInput');
+            const command = commandInput.value.trim();
+            if (command !== '') {
+                socket.emit('terminal_input', command);
+                appendToTerminal(`> ${command}`, 'input');
+                commandInput.value = '';
+            }
+        }
+
+        document.getElementById('commandInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendCommand();
+            }
+        });
+
+        function updatePrompt() {
+            socket.emit('terminal_input', 'pwd');
+        }
+
+        function appendToTerminal(text) {
+            const terminal = document.getElementById('terminal');
+            const span = document.createElement('span');
+            span.textContent = text;
+            terminal.appendChild(span);
+            terminal.appendChild(document.createElement('br'));
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        socket.on('current_directory', (directory) => {
+            currentPath = directory.trim();
+            document.getElementById('prompt').textContent = `${currentPath} >`;
+        });
+
+        socket.on('command_response', () => {
+            updatePrompt();
+        });
+        function limitPasteLength(event) {
+            // Get the pasted text
+            const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+
+            // Set the maximum allowed length
+            const maxLength = 100; // Adjust as needed
+
+            // Prevent pasting if the length exceeds maxLength
+            if (pastedText.length > maxLength) {
+                event.preventDefault();
+                // Optionally, you can provide feedback to the user about the limit
+                console.log('Pasting is not allowed. Maximum length exceeded.');
+            }
+        };
+        function limitCharactersPerLine(event) {
+            const textarea = event.target;
+            const maxCharactersPerLine = 90;
+            
+            // Split the value of the textarea by newline characters
+            const lines = textarea.value.split('\n');
+            
+            // Loop through each line and truncate if necessary
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].length > maxCharactersPerLine) {
+                    lines[i] = lines[i].substring(0, maxCharactersPerLine);
+                }
+            }
+            
+            // Join the lines back together and update the value of the textarea
+            textarea.value = lines.join('\n');
+        };
+    </script>
+</body>
+</html>
